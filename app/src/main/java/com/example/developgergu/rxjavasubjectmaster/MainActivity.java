@@ -2,7 +2,8 @@ package com.example.developgergu.rxjavasubjectmaster;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -13,11 +14,28 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.PublishSubject;
 
 public class MainActivity extends AppCompatActivity {
+    PublishSubject<String> publishSubject;
+    Disposable dp;
+    int index;
+    private static final String TAG = "TAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        publishSubject = PublishSubject.create();
+    }
+
+    public void start(View view) {
+        funSubject();
+    }
+
+    public void emit(View view) {
+        publishSubject.onNext("emit:" + index++);
+    }
+
+    public void complete(View view) {
+        publishSubject.onComplete();
     }
 
     private void fun() {
@@ -51,36 +69,43 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNext(String s) {
 
-                Log.e("TAG", "subject:" + s); //接收到 as Bridge
             }
         });
 
     }
-    private void funSubject(){
-        PublishSubject<String> publishSubject = PublishSubject.create();
-        publishSubject.onNext("hello");
-        publishSubject.onNext("world!");
-        publishSubject.onComplete();
+
+    private void funSubject() {
+
         publishSubject.subscribe(new Observer<String>() {
             @Override
             public void onSubscribe(@NonNull Disposable d) {
-
+                dp = d;
             }
 
             @Override
             public void onNext(@NonNull String s) {
-
+                Toast.makeText(MainActivity.this, "onNext:" + s, Toast.LENGTH_SHORT).show(); //接收到 as Bridge
             }
 
             @Override
             public void onError(@NonNull Throwable e) {
-
             }
 
             @Override
             public void onComplete() {
-
+                if (!dp.isDisposed()) {
+                    dp.dispose();
+                }
+                Toast.makeText(MainActivity.this, "onComplete", Toast.LENGTH_SHORT).show(); //接收到 as Bridge
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!dp.isDisposed()) {
+            dp.dispose();
+        }
     }
 }
