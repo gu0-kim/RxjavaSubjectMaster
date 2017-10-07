@@ -17,7 +17,6 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.BiFunction;
 
 
 public class ZipFragment extends Fragment implements View.OnClickListener {
@@ -91,12 +90,7 @@ public class ZipFragment extends Fragment implements View.OnClickListener {
             e.onNext("4444");
         });
         Observable<Long> ob2 = Observable.interval(1, TimeUnit.SECONDS);
-        Observable.zip(ob1, ob2, new BiFunction<String, Long, String>() {
-            @Override
-            public String apply(@NonNull String s, @NonNull Long aLong) throws Exception {
-                return s + aLong;
-            }
-        }).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<String>() {
+        Observable.zip(ob1, ob2, (s, aLong) -> s + "," + aLong).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<String>() {
             @Override
             public void onSubscribe(@NonNull Disposable d) {
 
