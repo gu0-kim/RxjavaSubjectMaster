@@ -9,9 +9,9 @@ public class TestActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-        MergeFragment scanFragment = (MergeFragment) getSupportFragmentManager().findFragmentById(R.id.contain_view);
+        ZipFragment scanFragment = (ZipFragment) getSupportFragmentManager().findFragmentById(R.id.contain_view);
         if (scanFragment == null) {
-            scanFragment = MergeFragment.newInstance("scan", "0");
+            scanFragment = ZipFragment.newInstance("scan", "0");
             getSupportFragmentManager().beginTransaction().add(R.id.contain_view, scanFragment).commit();
         }
     }
