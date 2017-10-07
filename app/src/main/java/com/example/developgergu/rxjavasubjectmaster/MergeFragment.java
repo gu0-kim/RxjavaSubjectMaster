@@ -11,8 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
@@ -87,32 +85,26 @@ public class MergeFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.button4) {
-            Merge();
+            MergeContainsErro();
         }
     }
 
     public void MergeContainsErro() {
-        Observable<String> ob1 = Observable.create(new ObservableOnSubscribe<String>() {
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
-                e.onNext("1");
-                e.onNext("22");
-                e.onNext("333");
-                e.onNext("4444");
-                e.onError(new Throwable("throw a error"));
-            }
+        Observable<String> ob1 = Observable.create(e -> {
+            e.onNext("1");
+            e.onNext("22");
+            e.onNext("333");
+            e.onNext("4444");
+            e.onError(new Throwable("throw a error"));
         });
-        Observable<String> ob2 = Observable.create(new ObservableOnSubscribe<String>() {
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
-                e.onNext("1");
-                e.onNext("22");
-                e.onNext("333");
-                e.onNext("4444");
-                e.onComplete();
-            }
+        Observable<String> ob2 = Observable.create(e -> {
+            e.onNext("1");
+            e.onNext("22");
+            e.onNext("333");
+            e.onNext("4444");
+            e.onComplete();
         });
-        Observable.merge(ob1, ob2).subscribe(new Observer<String>() {
+        Observable.mergeDelayError(ob1, ob2).subscribe(new Observer<String>() {
             @Override
             public void onSubscribe(@NonNull Disposable d) {
 
