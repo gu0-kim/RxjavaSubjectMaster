@@ -11,6 +11,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+
+import static io.reactivex.Observable.merge;
 
 
 public class MergeFragment extends Fragment implements View.OnClickListener {
@@ -72,7 +79,7 @@ public class MergeFragment extends Fragment implements View.OnClickListener {
     public void Merge() {
         Observable ob = Observable.just("1", "22", "333", "4444", "55555");
         Observable obr = Observable.just("555555", "4444", "333", "22", "1");
-        Observable.merge(ob, obr).subscribe(o -> {
+        merge(ob, obr).subscribe(o -> {
             Log.d(TAG, "Merge: o");
         });
     }
@@ -82,5 +89,49 @@ public class MergeFragment extends Fragment implements View.OnClickListener {
         if (view.getId() == R.id.button4) {
             Merge();
         }
+    }
+
+    public void MergeContainsErro() {
+        Observable<String> ob1 = Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
+                e.onNext("1");
+                e.onNext("22");
+                e.onNext("333");
+                e.onNext("4444");
+                e.onError(new Throwable("throw a error"));
+            }
+        });
+        Observable<String> ob2 = Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
+                e.onNext("1");
+                e.onNext("22");
+                e.onNext("333");
+                e.onNext("4444");
+                e.onComplete();
+            }
+        });
+        Observable.merge(ob1, ob2).subscribe(new Observer<String>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(@NonNull String s) {
+                Log.e(TAG, "onNext: " + s);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
+                Log.e(TAG, "onComplete");
+            }
+        });
     }
 }
