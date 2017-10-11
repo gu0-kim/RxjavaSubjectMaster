@@ -9,10 +9,14 @@ public class TestActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-        MergeFragment fragment = (MergeFragment) getSupportFragmentManager().findFragmentById(R.id.contain_view);
+        GroupByFragment fragment =
+                (GroupByFragment) getSupportFragmentManager().findFragmentById(R.id.contain_view);
         if (fragment == null) {
-            fragment = MergeFragment.newInstance("scan", "0");
-            getSupportFragmentManager().beginTransaction().add(R.id.contain_view, fragment).commit();
+            fragment = GroupByFragment.newInstance("scan", "0");
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.contain_view, fragment)
+                    .commit();
         }
     }
 }
