@@ -18,7 +18,6 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
 
-
 public class MapFragment extends Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -56,14 +55,13 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_scan, container, false);
         Button button = view.findViewById(R.id.button4);
         button.setOnClickListener(this);
         return view;
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -75,7 +73,6 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         super.onDetach();
     }
 
-
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.button4) {
@@ -86,7 +83,8 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     }
 
     public void map() {
-        Observable<String> ob2 = Observable.interval(1, TimeUnit.SECONDS).map(aLong -> "interval : " + aLong);
+        Observable<String> ob2 =
+                Observable.interval(1, TimeUnit.SECONDS).map(aLong -> "interval : " + aLong);
         cd.add(ob2.subscribeOn(AndroidSchedulers.mainThread()).subscribeWith(getObserver()));
     }
 
