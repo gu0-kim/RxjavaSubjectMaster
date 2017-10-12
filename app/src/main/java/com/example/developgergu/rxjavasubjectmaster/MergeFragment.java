@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -101,7 +103,9 @@ public class MergeFragment extends Fragment implements View.OnClickListener {
     }
 
     public Observable<Integer> getSource() {
-        return Observable.just(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        Integer[] ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+        List<Integer> list = Arrays.asList(ints);
+        return Observable.fromIterable(list);
     }
 
     public void zipTest() {

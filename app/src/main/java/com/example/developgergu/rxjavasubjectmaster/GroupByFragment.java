@@ -10,8 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.jakewharton.rxbinding2.view.RxView;
+
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -19,7 +20,6 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 public class GroupByFragment extends Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
@@ -60,7 +60,12 @@ public class GroupByFragment extends Fragment implements View.OnClickListener {
             LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_scan, container, false);
         Button button = view.findViewById(R.id.button4);
-        button.setOnClickListener(this);
+        RxView.drags(button)
+                .subscribe(
+                        dragEvent -> {
+                            Log.e(TAG, "dragEvent : " + dragEvent.getAction());
+                        });
+
         return view;
     }
 
@@ -75,34 +80,88 @@ public class GroupByFragment extends Fragment implements View.OnClickListener {
     }
 
     public void syncZip() {
-        Integer[] source = new Integer[16];
-        for (int i = 0; i < source.length; i++) {
-            source[i] = i;
-        }
-        List<Integer> list = Arrays.asList(source);
         Observable.zip(
-                        Observable.fromIterable(list),
+                        getSource(),
                         Observable.interval(3, TimeUnit.SECONDS),
                         (integer, aLong) -> integer + ",aLong = " + aLong)
                 .subscribe(s -> Log.e(TAG, ": zip s= " + s));
     }
 
+    public void compose() {}
+
+    public void syncMultiZip() {
+        Observable.zip(
+                        getSource(),
+                        getSource(),
+                        getSource(),
+                        Observable.interval(3, TimeUnit.SECONDS),
+                        (integer, integer2, integer3, aLong) ->
+                                "integer="
+                                        + integer
+                                        + ",integer2="
+                                        + integer2
+                                        + ",integer3="
+                                        + integer3
+                                        + ",time="
+                                        + aLong)
+                .subscribe(s -> Log.e(TAG, "syncMultiZip: result : " + s));
+    }
+
     public void asyncZip() {
-        Integer[] source = new Integer[16];
+        getSource()
+                .flatMap(
+                        integer ->
+                                //                Observable.timer(integer, TimeUnit.SECONDS))
+                                //                Observable.timer(integer,
+                                // TimeUnit.SECONDS).map(aLong -> integer))
+                                Observable.just(integer).delay(3, TimeUnit.SECONDS))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Integer>() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {}
+
+                            @Override
+                            public void onNext(@NonNull Integer integer) {
+                                Log.d(TAG, "onNext: integer=" + integer);
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+                                e.printStackTrace();
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                Log.d(TAG, "onComplete");
+                            }
+                        });
+    }
+
+    public void testSync() {
+        getSource()
+                .flatMap(
+                        integer ->
+                                Observable.zip(
+                                        Observable.just(integer),
+                                        Observable.timer(3, TimeUnit.SECONDS),
+                                        (i, aLong) -> i))
+                .subscribe(o -> Log.e(TAG, "testSync: o= " + o));
+        Log.e(TAG, "testSync: ----over!----");
+    }
+
+    public Observable<Integer> getSource() {
+        Integer[] source = new Integer[5];
         for (int i = 0; i < source.length; i++) {
             source[i] = i;
         }
-        List<Integer> list = Arrays.asList(source);
-        Observable.fromIterable(list)
-                .flatMap(integer -> Observable.timer(3, TimeUnit.SECONDS))
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aLong -> Log.e(TAG, "asyncZip: s=" + aLong));
+        return Observable.fromIterable(Arrays.asList(source));
     }
 
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.button4) {
+            //      asyncZip();
             asyncZip();
         }
     }
