@@ -13,11 +13,10 @@ public class TestActivity extends AppCompatActivity {
                 new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
         setContentView(R.layout.activity_test);
-        DragObserverFragment fragment =
-                (DragObserverFragment)
-                        getSupportFragmentManager().findFragmentById(R.id.contain_view);
+        OperationsFragment fragment =
+                (OperationsFragment) getSupportFragmentManager().findFragmentById(R.id.contain_view);
         if (fragment == null) {
-            fragment = DragObserverFragment.newInstance();
+            fragment = OperationsFragment.newInstance("", "");
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.contain_view, fragment)
